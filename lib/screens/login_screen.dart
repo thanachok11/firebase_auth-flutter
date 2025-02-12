@@ -16,6 +16,21 @@ class LoginScreenState extends State<LoginScreen> {
   final AuthService _authService = AuthService();
   String message = '';
 
+  // ฟังก์ชันในการแสดง Popup หรือ SnackBar
+  void showPopupMessage(String message, {bool isSuccess = false}) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          message,
+          style: const TextStyle(fontSize: 16, color: Colors.white),
+        ),
+        backgroundColor: isSuccess ? Colors.green : Colors.red,
+        behavior: SnackBarBehavior.floating,
+        margin: const EdgeInsets.all(16),
+      ),
+    );
+  }
+
   void login() async {
     String? error = await _authService.signIn(
       emailController.text.trim(),
@@ -25,8 +40,9 @@ class LoginScreenState extends State<LoginScreen> {
     if (!mounted) return;
 
     if (error == null) {
-      // ถ้าล็อกอินสำเร็จ แสดงข้อความและรอ 2 วินาที
-      setState(() => message = 'เข้าสู่ระบบสำเร็จ! กำลังไปยังหน้า Home...');
+      // ถ้าล็อกอินสำเร็จ แสดงข้อความสำเร็จใน SnackBar
+      showPopupMessage('เข้าสู่ระบบสำเร็จ! กำลังไปยังหน้า Home...',
+          isSuccess: true);
 
       await Future.delayed(const Duration(seconds: 2));
 
@@ -66,7 +82,12 @@ class LoginScreenState extends State<LoginScreen> {
       appBar: AppBar(
         title: const Text(
           'เข้าสู่ระบบ',
-          style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+          style: TextStyle(
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+            color:
+                Color.fromARGB(255, 212, 211, 211), 
+          ),
         ),
         backgroundColor: Colors.brown,
       ),

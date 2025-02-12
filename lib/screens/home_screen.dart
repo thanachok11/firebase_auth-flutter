@@ -10,7 +10,7 @@ class HomeScreen extends StatelessWidget {
   void logout(BuildContext context) async {
     await _authService.signOut();
 
-    // ✅ ตรวจสอบ context.mounted ก่อนใช้ Navigator
+    // ตรวจสอบ context.mounted ก่อนใช้ Navigator
     if (!context.mounted) return;
 
     Navigator.pushReplacement(
@@ -21,28 +21,62 @@ class HomeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // ดึงข้อมูลอีเมลของผู้ใช้ที่ล็อกอินเข้ามา
+    String userEmail = _authService.getCurrentUserEmail();
+
     return Scaffold(
       appBar: AppBar(
         title: const Text(
           'หน้าหลัก',
-          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+          style: TextStyle(
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+            color: Color.fromARGB(255, 212, 211, 211),
+          ),
         ),
-        backgroundColor: Colors.brown, // ✅ เปลี่ยนสีให้ดูอบอุ่น
+        backgroundColor: Colors.brown,
         actions: [
-          IconButton(
-            icon: const Icon(Icons.logout, color: Colors.white),
-            onPressed: () => logout(context),
-          )
+          PopupMenuButton<String>(
+            onSelected: (value) {
+              if (value == 'logout') {
+                logout(context);
+              }
+            },
+            itemBuilder: (BuildContext context) {
+              return [
+                PopupMenuItem<String>(
+                  value: 'profile',
+                  child: Row(
+                    children: [
+                      const Icon(Icons.email, color: Colors.black),
+                      const SizedBox(width: 10),
+                      Text(userEmail),
+                    ],
+                  ),
+                ),
+                const PopupMenuItem<String>(
+                  value: 'logout',
+                  child: Row(
+                    children: [
+                      Icon(Icons.logout, color: Colors.black),
+                      SizedBox(width: 10),
+                      Text('ออกจากระบบ'),
+                    ],
+                  ),
+                ),
+              ];
+            },
+          ),
         ],
       ),
       body: const Center(
         child: Padding(
-          padding: EdgeInsets.all(20.0), // ✅ เพิ่ม Padding
+          padding: EdgeInsets.all(20.0),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Icon(
-                Icons.coffee, // ✅ ใช้ไอคอนแทนความเป็นกันเอง
+                Icons.coffee,
                 size: 80,
                 color: Colors.brown,
               ),

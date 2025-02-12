@@ -12,9 +12,22 @@ class RegisterScreenState extends State<RegisterScreen> {
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
   final TextEditingController confirmPasswordController =
-      TextEditingController(); // ✅ เพิ่มช่องยืนยันรหัสผ่าน
+      TextEditingController();
   final AuthService _authService = AuthService();
-  String message = '';
+
+  void showPopupMessage(String message, {bool isSuccess = false}) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          message,
+          style: const TextStyle(fontSize: 16, color: Colors.white),
+        ),
+        backgroundColor: isSuccess ? Colors.green : Colors.red,
+        behavior: SnackBarBehavior.floating, // ทำให้ Popup ลอยขึ้นด้านบน
+        margin: const EdgeInsets.all(16),
+      ),
+    );
+  }
 
   void register() async {
     final email = emailController.text.trim();
@@ -22,24 +35,25 @@ class RegisterScreenState extends State<RegisterScreen> {
     final confirmPassword = confirmPasswordController.text.trim();
 
     if (password != confirmPassword) {
-      setState(() => message = 'รหัสผ่านและยืนยันรหัสผ่านไม่ตรงกัน');
+      showPopupMessage('รหัสผ่านและยืนยันรหัสผ่านไม่ตรงกัน');
       return;
     }
 
     String? error = await _authService.signUp(email, password);
+    if (error != null) {
+      showPopupMessage(error);
+      return;
+    }
 
     if (!mounted) return;
 
-    if (error == null) {
-      setState(() => message = 'สมัครสมาชิกสำเร็จ! กำลังไปยังหน้าล็อกอิน...');
+    showPopupMessage('สมัครสมาชิกสำเร็จ! กำลังไปยังหน้าล็อกอิน...',
+        isSuccess: true);
 
-      await Future.delayed(const Duration(seconds: 2));
+    await Future.delayed(const Duration(seconds: 2));
 
-      if (mounted) {
-        Navigator.pop(context);
-      }
-    } else {
-      setState(() => message = error);
+    if (mounted) {
+      Navigator.pop(context);
     }
   }
 
@@ -102,11 +116,6 @@ class RegisterScreenState extends State<RegisterScreen> {
               child: const Text('สมัครสมาชิก',
                   style: TextStyle(fontSize: 18, color: Colors.white)),
             ),
-            if (message.isNotEmpty) ...[
-              const SizedBox(height: 10),
-              Text(message,
-                  style: const TextStyle(color: Colors.red, fontSize: 16)),
-            ],
           ],
         ),
       ),
