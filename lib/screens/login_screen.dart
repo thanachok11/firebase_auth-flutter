@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../services/auth_service.dart';
 import 'register_screen.dart';
 import 'home_screen.dart';
+import 'forgot_password_screen.dart'; // นำเข้า ForgotPasswordScreen
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -40,10 +41,8 @@ class LoginScreenState extends State<LoginScreen> {
     if (!mounted) return;
 
     if (error == null) {
-      // ถ้าล็อกอินสำเร็จ แสดงข้อความสำเร็จใน SnackBar
       showPopupMessage('เข้าสู่ระบบสำเร็จ! กำลังไปยังหน้า Home...',
           isSuccess: true);
-
       await Future.delayed(const Duration(seconds: 2));
 
       if (mounted) {
@@ -53,7 +52,6 @@ class LoginScreenState extends State<LoginScreen> {
         );
       }
     } else {
-      // ถ้าล็อกอินไม่สำเร็จ แสดง AlertDialog
       setState(() => message = error);
 
       showDialog(
@@ -66,7 +64,7 @@ class LoginScreenState extends State<LoginScreen> {
               TextButton(
                 child: const Text('ตกลง'),
                 onPressed: () {
-                  Navigator.of(context).pop(); // ปิด Dialog
+                  Navigator.of(context).pop();
                 },
               ),
             ],
@@ -85,8 +83,7 @@ class LoginScreenState extends State<LoginScreen> {
           style: TextStyle(
             fontSize: 20,
             fontWeight: FontWeight.bold,
-            color:
-                Color.fromARGB(255, 212, 211, 211), 
+            color: Color.fromARGB(255, 212, 211, 211),
           ),
         ),
         backgroundColor: Colors.brown,
@@ -116,7 +113,27 @@ class LoginScreenState extends State<LoginScreen> {
                     OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
               ),
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: 10),
+
+            // ปุ่มลืมรหัสผ่าน
+            Align(
+              alignment: Alignment.centerRight,
+              child: TextButton(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => const ForgotPasswordScreen()),
+                  );
+                },
+                child: const Text(
+                  'ลืมรหัสผ่าน?',
+                  style: TextStyle(fontSize: 16, color: Colors.brown),
+                ),
+              ),
+            ),
+
+            const SizedBox(height: 10),
             ElevatedButton(
               onPressed: login,
               style: ElevatedButton.styleFrom(
@@ -129,6 +146,7 @@ class LoginScreenState extends State<LoginScreen> {
               child: const Text('เข้าสู่ระบบ',
                   style: TextStyle(fontSize: 18, color: Colors.white)),
             ),
+
             const SizedBox(height: 10),
             TextButton(
               onPressed: () {
@@ -143,6 +161,7 @@ class LoginScreenState extends State<LoginScreen> {
                 style: TextStyle(fontSize: 16, color: Colors.brown),
               ),
             ),
+
             if (message.isNotEmpty) ...[
               const SizedBox(height: 10),
               Text(message,

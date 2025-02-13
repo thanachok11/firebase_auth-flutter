@@ -17,6 +17,16 @@ class AuthService {
     }
   }
 
+// รีเซ็ตรหัสผ่านผ่าน Firebase
+  Future<String?> resetPassword(String email) async {
+    try {
+      await _auth.sendPasswordResetEmail(email: email);
+      return null; // สำเร็จ
+    } on FirebaseAuthException catch (e) {
+      return e.message;
+    }
+  }
+
   // ล็อกอิน
   Future<String?> signIn(String email, String password) async {
     try {
